@@ -131,26 +131,21 @@ public class StringUtilsTest extends BaseTestCase {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "null, abc, false",
-                    "abc, null, false",
-                    "null, null, false",
-                    "abc, '', true",
-                    "'', a, false",
-                    "'Hello World', hello, true",
-                    "'Hello World', WORLD, true",
-                    "'Hello World', Java, false",
-                    "'@#$%', '$#', true",
-                    "'Ăn cơm', ăn, true"
-            },
-            nullValues = "null"
-    )
+    @CsvSource(value = {
+            "null, abc, false",
+            "abc, null, false",
+            "null, null, false",
+            "abc, '', true",
+            "'', a, false",
+            "'Hello World', hello, true",
+            "'Hello World', WORLD, true",
+            "'Hello World', Java, false",
+            "'@#$%', '$#', true",
+            "'Ăn cơm', ăn, true"
+    }, nullValues = "null")
     void testContainsIgnoreCaseParameterized(String text, String search, boolean expected) {
         assertEquals(expected, StringUtils.containsIgnoreCase(text, search));
     }
 
-}#
-
-Sơn nè
-he
+}
+// Sơn nè
