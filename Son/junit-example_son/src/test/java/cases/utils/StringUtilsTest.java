@@ -152,5 +152,4 @@ public class StringUtilsTest extends BaseTestCase {
 
 }#
 
-Sơn đẹp
-trai
+Sang nè
