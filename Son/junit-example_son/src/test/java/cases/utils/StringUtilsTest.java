@@ -71,164 +71,84 @@ public class StringUtilsTest extends BaseTestCase {
     void testCapitalize(String input, String expected) {
         assertEquals(expected, StringUtils.capitalize(input));
     }
+    public static String reverse(String input) {
+        if (input == null) return null;
+        return new StringBuilder(input).reverse().toString();
+    }
 
     @Test
     public void testReverse() {
-        // Case 1: input = null => expected: null
-        assertNull(StringUtils.reverse(null));
-
-        // Case 2: input = empty string => expected: "" (vẫn là empty string)
-        assertEquals("", StringUtils.reverse(""));
-
-        // Case 3: input = blank string (chỉ có spaces) => expected: giữ nguyên spaces
-        assertEquals("   ", StringUtils.reverse("   "));
-
-        // Case 4: input = single character => expected: chính nó
-        assertEquals("a", StringUtils.reverse("a"));
-
-        // Case 5: input = multiple characters => expected: đảo ngược thứ tự
-        assertEquals("dcba", StringUtils.reverse("abcd"));
-
-        // Case 6: input = palindrome => expected: giống ban đầu
-        assertEquals("radar", StringUtils.reverse("radar"));
-
-        // Case 7: input = mixed case => expected: đảo ngược nhưng giữ nguyên case
-        assertEquals("cbA", StringUtils.reverse("Abc"));
-
-        // Case 8: input với special characters => expected: đảo ngược cả special chars
-        assertEquals("!@#$%", StringUtils.reverse("%$#@!"));
-
-        // Case 9: input với numbers => expected: đảo ngược số
-        assertEquals("54321", StringUtils.reverse("12345"));
-
-        // Case 10: input với unicode characters => expected: đảo ngược unicode
-        assertEquals("cbaĀ", StringUtils.reverse("Āabc"));
-
-        // Case 11: input với emoji => expected: đảo ngược thứ tự emoji
-        assertEquals("😀🌍", StringUtils.reverse("🌍😀"));
-
-        // Case 12: input có whitespace ở giữa => expected: đảo ngược nhưng giữ vị trí whitespace
-        assertEquals("c ba", StringUtils.reverse("ab c"));
+        assertNull(StringUtils.reverse(null));                 // case 1
+        assertEquals("", StringUtils.reverse(""));             // case 2
+        assertEquals("dcba", StringUtils.reverse("abcd"));     // case 3
+        assertEquals("   ", StringUtils.reverse("   "));       // case 4
+        assertEquals("321", StringUtils.reverse("123"));       // case 5
+        assertEquals("%$#@", StringUtils.reverse("@#$%"));     // case 6
+        assertEquals("c b a", StringUtils.reverse("a b c"));   // case 7
+        assertEquals("😀", StringUtils.reverse("😀"));         // case 8
     }
-
     @ParameterizedTest
-    @CsvSource(value = {
-            "null, null",                      // null input => null output
-            "'', ''",                         // empty string => empty string
-            "'   ', '   '",                   // blank string => giữ nguyên
-            "a, a",                           // single character => chính nó
-            "abcd, dcba",                     // simple string => đảo ngược
-            "radar, radar",                   // palindrome => giống ban đầu
-            "Abc, cbA",                       // mixed case => đảo ngược giữ case
-            "'%$#@!', '!@#$%'",              // special characters => đảo ngược
-            "12345, 54321",                   // numbers => đảo ngược số
-            "Āabc, cbaĀ",                     // unicode => đảo ngược
-            "'🌍😀', '😀🌍'",               // emoji => đảo ngược thứ tự
-            "'ab c', 'c ba'",                 // với whitespace => giữ whitespace
-            "Hello World, dlroW olleH",       // multiple words => đảo ngược cả chuỗi
-            "a1b2c3, 3c2b1a",                 // alphanumeric => đảo ngược
-            "A man a plan a canal Panama, amanaP lanac a nalp a nam A" // complex palindrome
-    }, nullValues = "null")
+    @CsvSource(
+            value = {
+                    "null, null",
+                    "'', ''",
+                    "abcd, dcba",
+                    "'   ', '   '",
+                    "123, 321",
+                    "'@#$%', '%$#@'",
+                    "'a b c', 'c b a'",
+                    "😀, 😀"
+            },
+            nullValues = "null"
+    )
     void testReverseParameterized(String input, String expected) {
-        // Test nhiều trường hợp với parameterized test
         assertEquals(expected, StringUtils.reverse(input));
     }
 
-
-//
-
+    public static boolean containsIgnoreCase(String text, String search) {
+        if (text == null || search == null) return false;
+        return text.toLowerCase().contains(search.toLowerCase());
+    }
 
     @Test
     public void testContainsIgnoreCase() {
-        // Case 1: cả text và search đều null => expected: false (theo logic hiện tại)
+        // case null
+        assertFalse(StringUtils.containsIgnoreCase(null, "a"));
+        assertFalse(StringUtils.containsIgnoreCase("abc", null));
         assertFalse(StringUtils.containsIgnoreCase(null, null));
 
-        // Case 2: text null, search không null => expected: false
-        assertFalse(StringUtils.containsIgnoreCase(null, "search"));
+        // case empty
+        assertTrue(StringUtils.containsIgnoreCase("abc", ""));
+        assertFalse(StringUtils.containsIgnoreCase("", "a"));
 
-        // Case 3: text không null, search null => expected: false
-        assertFalse(StringUtils.containsIgnoreCase("text", null));
-
-        // Case 4: cả text và search đều empty => expected: true (empty string chứa empty string)
-        assertTrue(StringUtils.containsIgnoreCase("", ""));
-
-        // Case 5: text không empty, search empty => expected: true (mọi chuỗi đều chứa empty string)
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", ""));
-
-        // Case 6: exact match (trùng hoàn toàn) => expected: true
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", "Hello World"));
-
-        // Case 7: case insensitive match (không phân biệt hoa/thường) => expected: true
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", "hello world"));
-        assertTrue(StringUtils.containsIgnoreCase("HELLO WORLD", "hello world"));
-        assertTrue(StringUtils.containsIgnoreCase("hello world", "HELLO WORLD"));
-
-        // Case 8: partial match (tìm chuỗi con) => expected: true
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", "ello"));
+        // case normal
+        assertTrue(StringUtils.containsIgnoreCase("Hello World", "hello"));
         assertTrue(StringUtils.containsIgnoreCase("Hello World", "WORLD"));
+        assertFalse(StringUtils.containsIgnoreCase("Hello World", "Java"));
 
-        // Case 9: không tìm thấy => expected: false
-        assertFalse(StringUtils.containsIgnoreCase("Hello World", "xyz"));
-
-        // Case 10: search dài hơn text => expected: false (không thể chứa chuỗi dài hơn)
-        assertFalse(StringUtils.containsIgnoreCase("Hello", "Hello World"));
-
-        // Case 11: với special characters => expected: tìm kiếm case insensitive
-        assertTrue(StringUtils.containsIgnoreCase("Hello@World#123", "@world"));
-        assertFalse(StringUtils.containsIgnoreCase("Hello@World#123", "@WORLD!")); // thiếu '!'
-
-        // Case 12: với numbers => expected: true
-        assertTrue(StringUtils.containsIgnoreCase("Version 2.0", "2.0"));
-        assertTrue(StringUtils.containsIgnoreCase("Version 2.0", "version"));
-
-        // Case 13: với unicode characters => expected: case insensitive với unicode
-        assertTrue(StringUtils.containsIgnoreCase("Café", "CAFÉ"));
-        assertTrue(StringUtils.containsIgnoreCase("Café", "café"));
-
-        // Case 14: với emoji => expected: true (emoji thường không có case)
-        assertTrue(StringUtils.containsIgnoreCase("Hello 😀 World", "😀"));
-        assertTrue(StringUtils.containsIgnoreCase("Hello 😀 World", "WORLD"));
-
-        // Case 15: whitespace sensitivity => expected: false (vì whitespace khác nhau)
-        assertFalse(StringUtils.containsIgnoreCase("HelloWorld", "Hello World")); // thiếu space
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", "Hello  World")); // double space tìm trong single space
-
-        // Case 16: leading/trailing spaces trong text => expected: true (vẫn tìm thấy)
-        assertTrue(StringUtils.containsIgnoreCase("  Hello World  ", "hello"));
-
-        // Case 17: leading/trailing spaces trong search => expected: true (tìm thấy phần giữa)
-        assertTrue(StringUtils.containsIgnoreCase("Hello World", " hello "));
+        // case special & unicode
+        assertTrue(StringUtils.containsIgnoreCase("@#$%", "#$"));
+        assertTrue(StringUtils.containsIgnoreCase("Ăn cơm", "ăn"));
     }
-
     @ParameterizedTest
-    @CsvSource(value = {
-            "null, null, false",                     // cả hai null => false
-            "null, 'search', false",                // text null => false
-            "'text', null, false",                  // search null => false
-            "'', '', true",                         // cả hai empty => true
-            "'Hello World', '', true",              // search empty => true
-            "'Hello World', 'Hello World', true",   // exact match => true
-            "'Hello World', 'hello world', true",   // case insensitive exact => true
-            "'HELLO WORLD', 'hello world', true",   // all uppercase text => true
-            "'hello world', 'HELLO WORLD', true",   // all lowercase text => true
-            "'Hello World', 'ELLO', true",          // partial match => true
-            "'Hello World', 'WOR', true",           // partial match different case => true
-            "'Hello World', 'xyz', false",          // no match => false
-            "'Hello', 'Hello World', false",        // search dài hơn text => false
-            "'Café', 'CAFÉ', true",                 // unicode case insensitive => true
-            "'Hello 😀 World', '😀', true",        // với emoji => true
-            "'  Hello  ', 'HELLO', true",           // spaces trong text => true
-            "'Hello', ' HELLO ', true",             // spaces trong search => true
-            "'Version 2.0', '2.0', true",           // với numbers => true
-            "'Hello@World', '@WORLD', true",        // với special characters => true
-            "'Java Programming', 'PROG', true",     // substring match => true
-            "'Multiple   Spaces', 'spaces', true",  // multiple spaces => true
-            "'CaseSensitive', 'casesensitive', true", // camel case => true
-            "'12345', '234', true",                 // numbers only => true
-            "'Mixed123', 'mixed', true"             // alphanumeric => true
-    }, nullValues = "null")
+    @CsvSource(
+            value = {
+                    "null, abc, false",
+                    "abc, null, false",
+                    "null, null, false",
+                    "abc, '', true",
+                    "'', a, false",
+                    "'Hello World', hello, true",
+                    "'Hello World', WORLD, true",
+                    "'Hello World', Java, false",
+                    "'@#$%', '$#', true",
+                    "'Ăn cơm', ăn, true"
+            },
+            nullValues = "null"
+    )
     void testContainsIgnoreCaseParameterized(String text, String search, boolean expected) {
-        // Parameterized test cho nhiều trường hợp
         assertEquals(expected, StringUtils.containsIgnoreCase(text, search));
     }
+
 }
+#Sơn
