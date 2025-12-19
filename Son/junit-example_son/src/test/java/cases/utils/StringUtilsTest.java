@@ -150,4 +150,6 @@ public class StringUtilsTest extends BaseTestCase {
         assertEquals(expected, StringUtils.containsIgnoreCase(text, search));
     }
 
-}#Sơn
+}#
+
+Sơn nè
