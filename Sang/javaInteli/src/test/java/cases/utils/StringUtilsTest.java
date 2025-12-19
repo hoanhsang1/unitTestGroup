@@ -19,6 +19,7 @@ public class StringUtilsTest {
         assertFalse(StringUtils.isNullOrEmpty("àdsaga"));
         assertFalse(StringUtils.isNullOrEmpty("123"));
         assertFalse(StringUtils.isNullOrEmpty("0"));
+        assertFalse(StringUtils.isNullOrEmpty("null"));
     }
 
     @Test
@@ -51,8 +52,8 @@ public class StringUtilsTest {
                     "a1b2c3, A1b2c3",
                     "1a2b3c, 1a2b3c"
             }, nullValues = "null")
-    public void testCapitalizeSuccess(String Expected, String Actual) {
-        assertEquals(Actual,StringUtils.capitalize(Expected));
+    public void testCapitalizeSuccess(String input, String Expected) {
+        assertEquals(Expected,StringUtils.capitalize(input));
     }
 
     @Test
@@ -62,8 +63,21 @@ public class StringUtilsTest {
         assertEquals(StringUtils.reverse("null"),"llun");
     }
 
-    @Test
-    public void testcontainsIgnoreCase() {
-        assertTrue(StringUtils.containsIgnoreCase(null,""));
+    @ParameterizedTest
+    @CsvSource(value = {
+            "hello, he, true",
+            "hello, HE, true",
+            "HELLO, he, true",
+            "Hello World, world, true",
+            "java, python, false",
+            "'', '', true",
+            "'', a, false",
+            "text, '', true",
+            "null, '', false",
+            "text, null, false"
+    }, nullValues = "null")
+    void testContainsIgnoreCase(String text, String search, boolean expected) {
+        assertEquals(expected, StringUtils.containsIgnoreCase(text, search));
     }
+
 }
