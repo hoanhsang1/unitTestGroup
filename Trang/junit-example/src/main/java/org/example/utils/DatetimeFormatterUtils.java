@@ -10,7 +10,6 @@ public class DatetimeFormatterUtils {
     private DatetimeFormatterUtils() {
     }
 
-    // List of common formats you may want to parse
     private static final List<DateTimeFormatter> COMMON_FORMATS = List.of(
             DateTimeFormatter.ISO_LOCAL_DATE_TIME,
             DateTimeFormatter.ISO_OFFSET_DATE_TIME,
@@ -21,19 +20,23 @@ public class DatetimeFormatterUtils {
             DateTimeFormatter.ofPattern("dd/MM/yyyy")
     );
 
-    /**
-     * Tries parsing a date using multiple formats.
-     */
     public static LocalDateTime parseFlexible(String input) {
-        if (input == null) return null;
+        if (input == null || input.isBlank()) return null;
 
         for (DateTimeFormatter fmt : COMMON_FORMATS) {
             try {
                 return LocalDateTime.parse(input, fmt);
             } catch (DateTimeParseException ignore) {
             }
+
             try {
                 return ZonedDateTime.parse(input, fmt).toLocalDateTime();
+            } catch (Exception ignore) {
+            }
+
+            try {
+                LocalDate date = LocalDate.parse(input, fmt);
+                return date.atStartOfDay();
             } catch (Exception ignore) {
             }
         }
@@ -41,27 +44,30 @@ public class DatetimeFormatterUtils {
         throw new IllegalArgumentException("Unrecognized datetime format: " + input);
     }
 
-    /**
-     * Converts date/time between timezones.
-     */
     public static String convertTimezone(
             String datetime,
             ZoneId from,
             ZoneId to,
             String outputPattern
     ) {
+        if (datetime == null || from == null || to == null || outputPattern == null) {
+            return null;
+        }
+
         LocalDateTime parsed = parseFlexible(datetime);
+        if (parsed == null) return null;
+
         ZonedDateTime zdt = parsed.atZone(from).withZoneSameInstant(to);
         return zdt.format(DateTimeFormatter.ofPattern(outputPattern));
     }
 
-    /**
-     * Returns "2 days ago", "5 minutes ago", "just now" style strings.
-     */
     public static String toHumanReadableDiff(LocalDateTime target) {
         if (target == null) return null;
 
-        Duration diff = Duration.between(target, LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        if (target.isAfter(now)) return "in the future";
+
+        Duration diff = Duration.between(target, now);
         long seconds = diff.getSeconds();
 
         if (seconds < 60) return "just now";
@@ -74,29 +80,30 @@ public class DatetimeFormatterUtils {
         return (seconds / (365L * 86_400)) + " years ago";
     }
 
-    /**
-     * Returns the start of week (Monday).
-     */
     public static LocalDate getStartOfWeek(LocalDate input) {
+        if (input == null) return null;
         return input.with(DayOfWeek.MONDAY);
     }
 
-    /**
-     * Formats a timestamp into ISO string with milliseconds.
-     */
     public static String formatIsoWithMillis(LocalDateTime dateTime) {
         if (dateTime == null) return null;
         return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
     }
 
-    /**
-     * Adds or subtracts time using a compact pattern like "1d", "-3h", "45m".
-     */
     public static LocalDateTime shiftBy(String pattern, LocalDateTime base) {
         if (pattern == null || base == null) return base;
+        if (pattern.length() < 2) {
+            throw new IllegalArgumentException("Invalid pattern");
+        }
 
         char unit = pattern.charAt(pattern.length() - 1);
-        long value = Long.parseLong(pattern.substring(0, pattern.length() - 1));
+        long value;
+
+        try {
+            value = Long.parseLong(pattern.substring(0, pattern.length() - 1));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number in pattern");
+        }
 
         return switch (unit) {
             case 'd' -> base.plusDays(value);
