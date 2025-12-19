@@ -2,6 +2,7 @@ package org.example.utils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import org.example.utils.StringUtils;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
@@ -17,15 +18,18 @@ public class DatetimeFormatterUtils {
             DateTimeFormatter.RFC_1123_DATE_TIME,
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
             DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"),
+            DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
             DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"),
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"),
             DateTimeFormatter.ofPattern("dd/MM/yyyy")
     );
+
 
     /**
      * Tries parsing a date using multiple formats.
      */
     public static LocalDateTime parseFlexible(String input) {
-        if (input == null) return null;
+        if (input == null || StringUtils.isBlank(input)) return null;
 
         for (DateTimeFormatter fmt : COMMON_FORMATS) {
             try {
@@ -33,7 +37,8 @@ public class DatetimeFormatterUtils {
             } catch (DateTimeParseException ignore) {
             }
             try {
-                return ZonedDateTime.parse(input, fmt).toLocalDateTime();
+                LocalDate date = LocalDate.parse(input, fmt);
+                return date.atStartOfDay();
             } catch (Exception ignore) {
             }
         }
