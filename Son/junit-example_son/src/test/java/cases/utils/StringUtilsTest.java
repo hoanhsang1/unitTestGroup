@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class StringUtilsTest extends BaseTestCase {
     @Test
     public void testIsNullOrEmpty() {
@@ -52,61 +51,61 @@ public class StringUtilsTest extends BaseTestCase {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "null, null",
-                    "'', ''",
-                    "abcd, Abcd",
-                    "UPPERCASE, Uppercase",
-                    "'love you to the moon', 'Love You To The Moon'",
-                    "'@#$%', '@#$%'",
-                    "'   ', '   '",
-                    "123, 123",
-                    "' abc', ' Abc'",
-                    "ă, Ă",
-                    "a1b2c3, A1b2c3",
-                    "1a2b3c, 1a2b3c",
-                    "😀, 😀"
-            }, nullValues = "null")
+    @CsvSource(value = {
+            "null, null",
+            "'', ''",
+            "abcd, Abcd",
+            "UPPERCASE, Uppercase",
+            "'love you to the moon', 'Love You To The Moon'",
+            "'@#$%', '@#$%'",
+            "'   ', '   '",
+            "123, 123",
+            "' abc', ' Abc'",
+            "ă, Ă",
+            "a1b2c3, A1b2c3",
+            "1a2b3c, 1a2b3c",
+            "😀, 😀"
+    }, nullValues = "null")
     void testCapitalize(String input, String expected) {
         assertEquals(expected, StringUtils.capitalize(input));
     }
+
     public static String reverse(String input) {
-        if (input == null) return null;
+        if (input == null)
+            return null;
         return new StringBuilder(input).reverse().toString();
     }
 
     @Test
     public void testReverse() {
-        assertNull(StringUtils.reverse(null));                 // case 1
-        assertEquals("", StringUtils.reverse(""));             // case 2
-        assertEquals("dcba", StringUtils.reverse("abcd"));     // case 3
-        assertEquals("   ", StringUtils.reverse("   "));       // case 4
-        assertEquals("321", StringUtils.reverse("123"));       // case 5
-        assertEquals("%$#@", StringUtils.reverse("@#$%"));     // case 6
-        assertEquals("c b a", StringUtils.reverse("a b c"));   // case 7
-        assertEquals("😀", StringUtils.reverse("😀"));         // case 8
+        assertNull(StringUtils.reverse(null)); // case 1
+        assertEquals("", StringUtils.reverse("")); // case 2
+        assertEquals("dcba", StringUtils.reverse("abcd")); // case 3
+        assertEquals("   ", StringUtils.reverse("   ")); // case 4
+        assertEquals("321", StringUtils.reverse("123")); // case 5
+        assertEquals("%$#@", StringUtils.reverse("@#$%")); // case 6
+        assertEquals("c b a", StringUtils.reverse("a b c")); // case 7
+        assertEquals("😀", StringUtils.reverse("😀")); // case 8
     }
+
     @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "null, null",
-                    "'', ''",
-                    "abcd, dcba",
-                    "'   ', '   '",
-                    "123, 321",
-                    "'@#$%', '%$#@'",
-                    "'a b c', 'c b a'",
-                    "😀, 😀"
-            },
-            nullValues = "null"
-    )
+    @CsvSource(value = {
+            "null, null",
+            "'', ''",
+            "abcd, dcba",
+            "'   ', '   '",
+            "123, 321",
+            "'@#$%', '%$#@'",
+            "'a b c', 'c b a'",
+            "😀, 😀"
+    }, nullValues = "null")
     void testReverseParameterized(String input, String expected) {
         assertEquals(expected, StringUtils.reverse(input));
     }
 
     public static boolean containsIgnoreCase(String text, String search) {
-        if (text == null || search == null) return false;
+        if (text == null || search == null)
+            return false;
         return text.toLowerCase().contains(search.toLowerCase());
     }
 
@@ -130,6 +129,7 @@ public class StringUtilsTest extends BaseTestCase {
         assertTrue(StringUtils.containsIgnoreCase("@#$%", "#$"));
         assertTrue(StringUtils.containsIgnoreCase("Ăn cơm", "ăn"));
     }
+
     @ParameterizedTest
     @CsvSource(
             value = {
@@ -150,5 +150,4 @@ public class StringUtilsTest extends BaseTestCase {
         assertEquals(expected, StringUtils.containsIgnoreCase(text, search));
     }
 
-}
-#Sơn
+}#Sơn
